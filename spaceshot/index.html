@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>My Canvas Experiments</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<style>
+.meCan{
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+</style>
+
+<script type="text/javascript">
+	var canvas;
+	var music;
+	var soundShot, soundShot2, shot1=false;
+	var imgShip;
+	var imgEnemy;
+	var imgStars;
+	var imgExplosion;
+	var width,height;
+	var px,py,vx,vy,sx,sy;
+	var sprites2 = new Array(8);
+	sprites2[0] = new Array(0,0,60,55);
+	sprites2[1] = new Array(60,0,60,55);
+	sprites2[2] = new Array(120,0,60,55);
+	sprites2[3] = new Array(180,0,60,55);
+	sprites2[4] = new Array(0,55,60,55);
+	sprites2[5] = new Array(60,55,60,55);
+	sprites2[6] = new Array(120,55,60,55);
+	sprites2[7] = new Array(180,55,60,55);
+	var sprites3 = new Array(12);
+	sprites3[0] = new Array(0,0,120,120);
+	sprites3[1] = new Array(120,0,120,120);
+	sprites3[2] = new Array(240,0,120,120);
+	sprites3[3] = new Array(0,120,120,120);
+	sprites3[4] = new Array(120,120,120,120);
+	sprites3[5] = new Array(240,120,120,120);
+	sprites3[6] = new Array(0,240,120,120);
+	sprites3[7] = new Array(120,240,120,120);
+	sprites3[8] = new Array(240,240,120,120);
+	sprites3[9] = new Array(0,360,120,120);
+	sprites3[10]= new Array(120,360,120,120);
+	sprites3[11]= new Array(240,360,120,120);
+	var enemyFrame=0, enemyX=300, enemyY=75, enemyDir=1,enemyHits=0,enemyExplosion=0,enemyKills=0,enemyLastShot=0,enemyWaitTime=2.0;
+	var shipExplosion=0, shipHits=0, shipLifes=2,shipLastShot=0,shipRoll=0;
+	var lasttime, curtime, dt;
+	var input = new Object();
+	var shots = new Array();
+	var bgx=0,bgy=0;
+	var gamestate=0;
+	var hoverPlay=false;
+	var soundOn=true;
+	input['up']=false;
+	input['down']=false;
+	input['left']=false;
+	input['right']=false;
+	input['roll']=false;
+	input['fire']=false;
+
+function onMouseMove(evt) {
+  if (evt.pageX > canvasMinX && evt.pageX < canvasMaxX) {
+    paddlex = evt.pageX - canvasMinX;
+  }
+}
+
+
+function shoot(shotDir){
+	shot = new Object();
+	shot.active = true;
+	shot.explosion = 0.0;
+	if(shotDir>0){
+		if( (curtime-shipLastShot)*0.001 < 0.25 || shipRoll>0)
+			return;
+		shipLastShot = curtime;
+		shot.px = px+sx*0.5;
+		shot.py = py;
+	}
+	else{
+		if( (curtime-enemyLastShot)*0.001 < 0.1)
+			return;
+		enemyLastShot = curtime;
+		shot.px = enemyX+30;
+		shot.py = enemyY+50;
+	}
+	shot.dir=shotDir
+	shots.push(shot);
+
+	shot1 = !shot1;
+	if(shot1) 
+		if(soundShot&&soundOn)soundShot.play();
+	else
+		if(soundShot2&&soundOn)soundShot2.play();	
+}
+
+function drawPlayButton(context, atx, aty){
+	context.font="italic 20px Arial";
+	context.strokeStyle = 'rgb(200,200,0)';
+	context.fillStyle = "rgb(200,200,0)";
+	
+	
+	context.fillText("Controls:", atx,aty);
+	context.fillText("Arrow keys to move", atx+100,aty);
+	context.fillText("Space bar to shoot", atx+100,aty+30);
+	context.fillText("Ctrl + left/right to roll", atx+100,aty+60);
+	context.fillText("Return to pause", atx+100,aty+90);
+	context.fillText("Space bar to shoot", atx+100,aty+120);
+	context.fillText("Click Play to start:", atx+420,aty);
+
+	if(hoverPlay==true)
+		context.fillStyle = "#FFFF00";
+	context.beginPath();
+	context.arc(atx+500, aty+70, 40, 0, 2 * Math.PI, false);
+	context.fill();
+	context.closePath();
+
+	context.fillStyle = "#000000";
+	context.beginPath();
+	context.moveTo(atx+480, aty+40); // give the (x,y) coordinates
+	context.lineTo(atx+480, aty+100);
+	context.lineTo(atx+530, aty+70);
+	context.lineTo(atx+480, aty+40);
+	context.fill();
+	context.closePath();
+}
+
+function drawCredits(context, atx, aty)
+{
+	
+	context.font="italic 20px Arial";
+	context.fillStyle = "rgb(200,200,0)";
+	context.strokeRect(atx,aty,520,220);
+	
+	context.fillText("A great many thanks for the sprites I used, go to:", atx+30,aty+30);
+	
+	context.fillText("bittyjava.wordpress.com", atx+30, aty+60);
+	context.drawImage(imgShip, sprites[0][0], sprites[0][1], sprites[0][2], sprites[0][3], atx+50, aty+80, 65, 90);
+	context.drawImage(imgEnemy, sprites2[0][0], sprites2[0][1], sprites2[0][2], sprites2[0][3], atx+50, aty+175, 60, 55);
+
+	context.fillText("www.polybeast.de", atx+300, aty+60);
+	context.drawImage(imgExplosion, sprites3[6][0], sprites3[6][1], sprites3[6][2], sprites3[6][3], atx+330, aty+60, 120, 120);
+
+	context.fillText("www.stargazer.htmlplanet.com", atx+125, aty+205);
+	context.drawImage(imgStars, 0, 0, 512,512, atx+200, aty+80, 96, 96);
+
+}
+
+function drawWelcome(context){
+	context.font="italic 100px Arial";
+	context.strokeStyle = 'rgb(200,200,0)';
+	context.fillStyle = "rgb(200,200,0)";
+	context.lineWidth   = 4;
+	if(gamestate==0)
+		context.strokeText("WELCOME",150,100);
+	else
+		context.strokeText("GAME OVER",100,100);
+	
+	if(gamestate==0){
+		context.font="italic 20px Arial";
+		context.fillText("To this game-ish thing I made to tech myself HTML5.", 170,130);
+	}
+	else{
+		context.font="bold 40px Arial";
+		context.fillText("You shot "+enemyKills+" UFOs", 250,160);	
+	context.font="italic 20px Arial";
+	}
+
+	drawCredits(context, 150,360);	
+	
+
+	drawPlayButton(context, 100, 200);	
+}
+
+function drawBye(context){
+	context.font="italic 100px Arial";
+	context.fillStyle = "rgb(255,255,255)";
+	context.strokeStyle = 'rgb(200,200,0)';
+	context.lineWidth   = 4;
+	context.strokeText("GAME OVER",100,100);
+
+	context.strokeRect(150,130,520,420);
+
+	context.font="bold 40px Arial";
+	context.fillStyle = "rgb(200,200,0)";
+	context.fillText("You shot "+enemyKills+" UFOs", 250,280);
+
+	drawPlayButton(context, 30, 430);	
+}
+
+function drawPause(context){
+	context.font="italic 100px Arial";
+	context.fillStyle = "rgb(255,255,255)";
+	context.strokeStyle = 'rgb(200,200,0)';
+	context.lineWidth   = 4;
+	context.strokeText("PAUSE",250,350);
+
+	context.font="bold 20px Arial";
+	context.fillStyle = "rgb(200,200,0)";
+	context.fillText("Press Return to continue.", 280,390);
+
+	context.strokeRect(230,250,380,160);
+}
+
+function draw(sp){
+    if(canvas.getContext){
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(0, 0, 0)";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		//context.translate(200, 0);
+		//context.rotate(90 * Math.PI/180);
+
+		if(bgy<0)
+			bgy+=2*height;
+		if(bgy>2*height)
+			bgy-=2*height;
+		context.drawImage(imgStars, 0,0, 512,1024, bgx-100,-bgy,width+200,2*height);
+		context.drawImage(imgStars, 0,0, 512,1024, bgx-100,-bgy+2*height,width+200,2*height);
+
+		if(gamestate==0){
+			drawWelcome(context);
+			return;
+		}
+		else if(gamestate==2){
+			drawWelcome(context);
+			return;
+		}
+		else if(gamestate==3){
+			drawPause(context);
+			return;
+		}
+		
+		// only draw this if gamestate is 1, i.e. playing
+		if(enemyExplosion==0)
+		{
+			//Draw enemy
+			enemyFrame++;
+			if(enemyFrame>7)enemyFrame=0;
+			context.drawImage(imgEnemy, sprites2[enemyFrame][0], sprites2[enemyFrame][1], sprites2[enemyFrame][2], sprites2[enemyFrame][3], enemyX, enemyY, 60, 55);
+		}
+		else
+		{
+			var fe1 = Math.floor(enemyExplosion*10.0);
+			if(fe1<12) context.drawImage(imgExplosion, sprites3[fe1][0], sprites3[fe1][1], sprites3[fe1][2], sprites3[fe1][3], enemyX-10,enemyY-17,120,120);
+			var fe2 = Math.floor(enemyExplosion*20.0);
+			if(fe2<12) context.drawImage(imgExplosion, sprites3[fe2][0], sprites3[fe2][1], sprites3[fe2][2], sprites3[fe2][3], enemyX-30,enemyY-37,120,120);
+			var fe3 = Math.floor(enemyExplosion*20.0);
+			if(fe3<12) context.drawImage(imgExplosion, sprites3[fe3][0], sprites3[fe3][1], sprites3[fe3][2], sprites3[fe3][3], enemyX,enemyY-27,120,120);
+			var fe4 = Math.floor(enemyExplosion*15.0);
+			if(fe4<12) context.drawImage(imgExplosion, sprites3[fe4][0], sprites3[fe4][1], sprites3[fe4][2], sprites3[fe4][3], enemyX,enemyY,120,120);
+		}
+
+
+		//Draw ship
+		if(shipExplosion==0){
+			context.drawImage(imgShip, sprites[sp][0], sprites[sp][1], sprites[sp][2], sprites[sp][3], px,py,sx,sy);
+		}
+		else
+		{
+			var fe1 = Math.floor(shipExplosion*10.0);
+			if(fe1<12) context.drawImage(imgExplosion, sprites3[fe1][0], sprites3[fe1][1], sprites3[fe1][2], sprites3[fe1][3], px-10,py-17,120,120);
+			var fe2 = Math.floor(shipExplosion*20.0);
+			if(fe2<12) context.drawImage(imgExplosion, sprites3[fe2][0], sprites3[fe2][1], sprites3[fe2][2], sprites3[fe2][3], px-30,py-37,120,120);
+			var fe3 = Math.floor(shipExplosion*20.0);
+			if(fe3<12) context.drawImage(imgExplosion, sprites3[fe3][0], sprites3[fe3][1], sprites3[fe3][2], sprites3[fe3][3], px,py-27,120,120);
+			var fe4 = Math.floor(shipExplosion*15.0);
+			if(fe4<12) context.drawImage(imgExplosion, sprites3[fe4][0], sprites3[fe4][1], sprites3[fe4][2], sprites3[fe4][3], px,py,120,120);
+		}
+
+		
+		//Draw shots
+		for(var i=0, len=shots.length; i<len; i++){
+			if(!shots[i].active) continue;
+			if(shots[i].explosion == 0){
+				context.beginPath();
+				context.arc(shots[i].px, shots[i].py, 10, 0, 2 * Math.PI, false);
+				if(shots[i].dir>0)
+					context.fillStyle = "#8ED6FF";
+				else
+					context.fillStyle = "#FFD68A";
+				context.fill();
+			}
+			else{
+				var fe = Math.floor(shots[i].explosion);
+				context.drawImage(imgExplosion, sprites3[fe][0], sprites3[fe][1], sprites3[fe][2], sprites3[fe][3], shots[i].px-20,shots[i].py-20,40,40);
+			}
+		}
+
+
+		//Draw lifes
+		for(var i=0,lx=15; i<shipLifes;i++,lx+=50)
+			context.drawImage(imgShip, sprites[0][0], sprites[0][1], sprites[0][2], sprites[0][3], lx,15,37,50);
+
+		//Draw Kills
+		context.font="bold 40px Arial";
+		context.fillStyle = "rgb(200,200,0)";
+		context.fillText(""+enemyKills, width-85,45);
+
+
+		//Draw red debug point to verify that the shot array is being cleaned
+		/*if(shots.length == 0){
+			context.beginPath();
+			context.arc(px, py, 10, 0, 2 * Math.PI, false);
+			context.fillStyle = "#FF0000";
+			context.fill();
+		}*/
+    } // end if canvas
+}	
+
+function ev_touch (ev) {
+	soundOn=false;
+	if (ev.targetTouches.length == 1) {
+		var touch = ev.targetTouches[0];
+		// Place element where the finger is
+		//obj.style.left = touch.pageX + 'px';
+		//obj.style.top = touch.pageY + 'px';
+		if(touch.type == 'touchstart') touch.type = 'mousedown';
+		else if(touch.type == 'touchmove') touch.type = 'mousemove';
+		else if(touch.type == 'touchend') touch.type = 'mouseup';  
+		ev_canvas(touch);
+	}
+}
+
+function ev_canvas (ev) {
+  if (ev.layerX || ev.layerY == 0) { // Firefox
+    ev._x = ev.layerX;
+    ev._y = ev.layerY;
+  } else if (ev.offsetX || ev.offsetX == 0) { // Opera
+    ev._x = ev.offsetX;
+    ev._y = ev.offsetY;
+  } else {
+	  ev._x = ev.pageX;
+	  ev._y = ev.pageY;
+  }
+
+	hoverPlay=false;
+	if(ev._x>560 && ev._x<650 && ev._y>220 && ev._y<300){
+		hoverPlay=true;
+	}
+
+  // Call the event handler of the tool.
+  //var func = tool[ev.type];
+  //if (func) {
+    //func(ev);
+	//}
+  if(ev.type=='mousedown' || ev.type=='click'){
+	  if(gamestate==1)
+		  return;
+	  if(ev._x>560 && ev._x<650 && ev._y>220 && ev._y<300){
+		  if(soundShot&&soundOn) soundShot.currentTime=0; 
+		  if(soundShot&&soundOn) soundShot.play();
+		  shipLifes=2;
+		  enemyKills=0;
+		  gamestate=1;
+		  enemyWaitTime=2.0;
+	  }
+  }
+  if(ev.type=='mouseup' || ev.type=='click'){
+	  if(soundShot&&soundOn) soundShot.pause();
+  }
+}
+
+function onKeyDown(evt){
+	switch (evt.keyCode) {
+		case 32: // Space
+			if(shipExplosion==0)
+				shoot(1);
+			break;
+		case 13: if(gamestate==3) gamestate=1;
+			else if(gamestate==1) gamestate=3;	 
+			break;
+		case 17:  // Ctrl
+			input['roll']=true;
+			break;
+		case 38:  // Up
+			input['up']=true;
+			break;
+		case 40:  // Down
+			input['down']=true;
+			break;
+		case 37:  // Left
+			input['left']=true;
+			break;
+		case 39:  // Right
+			input['right']=true;
+			break;
+	}
+}
+
+function onKeyUp(evt){
+	switch (evt.keyCode) {
+		case 32: // Space
+			break;
+		case 17:  // Ctrl
+			input['roll']=false;
+			break;
+		case 38:  // Up
+			input['up']=false;
+			break;
+		case 40:  // Down
+			input['down']=false;
+			break;
+		case 37:  // Left
+			input['left']=false;
+			break;
+		case 39:  // Right
+			input['right']=false;
+			break;
+	}
+}
+
+function update()
+{
+	bgy-=dt*100.0;
+	if(gamestate!=1)
+		return;
+	var frame=0;
+	var roll=1;
+	var dx=0,dy=0;
+	if(input['up']==true){
+		frame += 4;
+		dy = -1;
+	}
+	else if(input['down']==true){
+		dy = 1;
+	}
+	if(input['left']==true){
+		frame += 1;
+		dx = -1;
+		bgx +=100.0*dt;
+		if(bgx>100)bgx=100;
+	}
+	else if(input['right']==true){
+		frame += 3;
+		dx = 1;
+		bgx -= 100.0*dt;
+		if(bgx<-100)bgx=-100;
+	}
+	else{
+		if(bgx>0)
+			bgx-=20.0*dt;
+		else if(bgx<0)
+			bgx+=20.0*dt;
+	}
+	if(input['roll']==true && frame!=0 && shipRoll==0){
+		shipRoll=0.6;
+	}
+	if(shipHits<3){
+		if(shipRoll<=0.0)
+			shipRoll=0.0;
+		else{
+			roll=2;
+			shipRoll -=dt;
+			frame = 4+Math.floor(shipRoll*30.0)%4;
+		}
+		px += dx*vx*dt*roll;
+		py += dy*vy*dt;
+		if(px<0)px=0;
+		else if(px>width-sx) px=width-sx;
+		if(py<150)py=150;
+		else if(py>height-sy*0.8) py=height-sy*0.8;
+	}
+	else
+	{
+		shipExplosion+=dt;
+		if(shipExplosion>2){
+			shipLifes--;
+			if(shipLifes<0){
+				shots = [];
+				gamestate=2;
+			}
+			shipHits=0;
+			shipExplosion=0;
+		}
+
+	}
+
+	if(enemyHits<3){
+		if(Math.random() > 0.98) enemyDir=-enemyDir;
+		if(enemyX>width-60) enemyDir=-1;
+		if(enemyX<30) enemyDir=1;
+		enemyX += enemyDir*500.0*dt;
+		if(enemyWaitTime>0.0)enemyWaitTime-=dt;
+		if(enemyWaitTime<=0.0 && Math.random()>0.95)
+			shoot(-1);
+	}
+	else
+	{
+		enemyExplosion+=dt;
+		if(enemyExplosion>2){
+			enemyX=-50;
+			enemyHits=0;
+			enemyKills++;
+			enemyExplosion=0;
+		}
+	}
+
+
+	var len = shots.length;
+	while(len>0 && !shots[0].active)
+		len=shots.shift();
+
+	for(var i=0, len=shots.length; i<len; i++){
+		if(shots[i].py < -20.0) shots[i].active=false;		
+		if(shots[i].py > height+20.0) shots[i].active=false;		
+		if(shots[i].explosion > 0.0){
+			shots[i].explosion += dt*30.0;
+			if(shots[i].explosion > 11)
+				shots[i].active=false;
+			continue;
+		}
+		if(shots[i].dir>0){
+			var a = shots[i].px - (enemyX+30);
+			var b = shots[i].py - (enemyY+25);
+			if( (a*a +b*b) <= 1200.0){
+				shots[i].explosion = dt*30.0 + 0.01;
+				enemyHits++;
+			}
+		}
+		else if(shipRoll==0.0){
+			var a = shots[i].px - (px+50);
+			var b = shots[i].py - (py+75);
+			if( (a*a +b*b) <= 4500.0){
+				shots[i].explosion = dt*30.0 + 0.01;
+				shipHits++;
+			}
+		}
+		shots[i].py -= shots[i].dir*400.0*dt;
+	}	
+
+
+	return frame;
+}
+
+function main_loop() {
+	curtime = new Date();
+	dt = (curtime - lasttime)*0.001;	
+	var tid = update();
+	draw(tid);
+	lasttime=curtime;
+}
+
+
+function init(){
+	music = document.getElementById('music');
+	soundShot = document.getElementById('shot');
+	soundShot2 = document.getElementById('shot2');
+	canvas = document.getElementById('meCan');
+	canvas.addEventListener('mousedown', ev_canvas, false);
+	canvas.addEventListener('mousemove', ev_canvas, false);
+	canvas.addEventListener('mouseup',   ev_canvas, false);
+	//canvas.addEventListener('click', ev_canvas, false);
+	canvas.addEventListener('touchstart', ev_touch, false);
+	canvas.addEventListener('touchmove', ev_touch, false);
+	canvas.addEventListener('touchend', ev_touch, false);
+	window.addEventListener('keydown',onKeyDown,false);
+	window.addEventListener('keyup',onKeyUp,false);
+
+	width=canvas.width;
+	height=canvas.height;
+	vx=500;
+	vy=500;
+	sx=99;
+	sy=154;
+	px=width*0.5-sx*0.5;
+	py=height-sy;
+
+	sprites = new Array(8);
+	sprites[0] = new Array(000,0,99,154);
+	sprites[1] = new Array(100,0,99,154);
+	sprites[2] = new Array(200,0,99,154);
+	sprites[3] = new Array(300,0,99,154);
+	sprites[4] = new Array(000,155,99,154);
+	sprites[5] = new Array(100,155,99,154);
+	sprites[6] = new Array(200,155,99,154);
+	sprites[7] = new Array(300,155,99,154);
+	
+	imgShip = new Image();
+	imgShip.src = 'scooter.png';
+	imgEnemy = new Image();
+	imgEnemy.src = 'enemy.png';
+	imgExplosion = new Image();
+	imgExplosion.src = 'explosion.png';
+	imgStars = new Image();
+	imgStars.src = 'stars1.png';
+
+	lasttime = new Date();
+	return setInterval(main_loop, 20);	
+}
+</script>
+</head>
+
+<body onload="init()">
+	<canvas id="meCan" width="800" height="600">
+		ERROR: Grafik nicht verfügbar!
+	</canvas>
+	<audio id="music">
+  		<source src="Hoverkraft.ogg" type="audio/ogg" />
+  		Your browser does not support the audio element.
+	</audio> 
+	<audio id="shot">
+  		<source src="shot.wav" type="audio/wav" />
+  		Your browser does not support the audio element.
+	</audio> 
+	<audio id="shot2">
+  		<source src="shot.wav" type="audio/wav" />
+  		Your browser does not support the audio element.
+	</audio> 
+	
+</body>
+</html>
