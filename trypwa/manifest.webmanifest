@@ -1,0 +1,17 @@
+{
+  "name": "Try PWA on Github",
+  "short_name": "TRYPWA",
+  "description": "Trying to use Github Page to host a test Progressive Web App",
+  "scope": "/trypwa/",
+  "start_url": "/trypwa/",
+  "background_color": "#adf3f8",
+  "theme_color": "#adf3f8",
+  "display": "standalone", 
+  "icons": [
+      {
+        "src": "/github-page-pwa/img/icon.png",
+        "type": "image/png",
+        "sizes": "700x700"
+      }
+  ]
+}

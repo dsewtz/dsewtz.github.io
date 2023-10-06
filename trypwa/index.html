@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TryPWA</title>
+  <link rel="canonical" href="https://dsewtz.github.io/trypwa/" />
+  <link rel="manifest" href="/trypwa/manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+ 
+  <h1>Trying out PWAs on github pages</h1>
+  <p>
+    Just copied from:
+    <a href="https://github.com/codepo8/github-page-pwa/">https://github.com/codepo8/github-page-pwa/</a>
+    for now...
+  </p>
+
+  <script>
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.register (
+          '/trypwa/sw.js',
+          {scope: '/trypwa/'}
+        )
+      }
+  </script>
+  <script src="js/app.js"></script>
+</body>
+</html>
