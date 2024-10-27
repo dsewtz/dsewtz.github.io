@@ -1,0 +1,17 @@
+{
+  "name": "Ride3js",
+  "short_name": "RIDE",
+  "description": "Improting a horse with ThreeJS",
+  "scope": "/ride3js/",
+  "start_url": "/ride3js/",
+  "background_color": "#ffffff",
+  "theme_color": "#ececec",
+  "display": "standalone", 
+  "icons": [
+      {
+        "src": "/ride3js/img/icon.png",
+        "type": "image/png",
+        "sizes": "700x700"
+      }
+  ]
+}
