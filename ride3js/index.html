@@ -37,7 +37,7 @@
 	</script>
   <script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three';			
 
 			//import Stats from 'three/addons/libs/stats.module.js';
 
@@ -46,6 +46,8 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let mixer;
 			let dog;
@@ -64,6 +66,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.xr.enabled = true;
 			container.appendChild( renderer.domElement );
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
@@ -159,6 +162,8 @@
 					dog.position.set(0, 0, 0);
 				}
 			};
+			
+			document.body.appendChild( VRButton.createButton( renderer ) );
 
 
 			window.onresize = function () {
