@@ -18,12 +18,6 @@
   
   <div id="container"></div>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes<br/>
-			Model: <a href="https://artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by
-			<a href="https://artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
-		</div>	-->	
-
   <script>
       if (navigator.serviceWorker) {
         navigator.serviceWorker.register (
@@ -54,6 +48,12 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			let mixer;
+			let dog;
+			let act_sit; 
+			let act_walk; 
+			let act_lie; 
+			let act_pee;
+			let ggltf;
 
 			const clock = new THREE.Clock();
 			const container = document.getElementById( 'container' );
@@ -86,14 +86,42 @@
 
 			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );
-			loader.load( 'models/dog.glb', function ( gltf ) {
+			loader.load( 'models/dog2.glb', function ( gltf ) {
 
 				const model = gltf.scene;
 				model.position.set( 0.0, 0.0, 0 );
 				model.scale.set( 1.0, 1.0, 1.0 );
-				scene.add( model );
+				//scene.add( model );
+				
+				dog = model;
+				scene.add(dog);
+				
+				
 
 				mixer = new THREE.AnimationMixer( model );
+				const clips = gltf.animations; 
+				// Play a specific animation 
+				//clip_sit = THREE.AnimationClip.findByName( clips, 'idle_sit' ); 
+				//clip_walk = THREE.AnimationClip.findByName( clips, 'idle_lie_down' );
+				//const action = mixer.clipAction( clip_sit ); 
+				//action.play(); 
+				{
+					const clip = THREE.AnimationClip.findByName( clips, 'idle_sit' );
+					act_sit = mixer.clipAction(clip);
+					//act_sit.play();
+				}
+				{	
+					const clip = THREE.AnimationClip.findByName( clips, 'idle_lie_down' );
+					act_lie = mixer.clipAction(clip);
+				}
+				{	
+					const clip = THREE.AnimationClip.findByName( clips, 'move_walk' );
+					act_walk = mixer.clipAction(clip);
+				}
+				// Play all animations: 
+				//clips.forEach( function ( clip ) { mixer.clipAction( clip ).play(); } );
+				ggltf = gltf;
+				
 				mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 				renderer.setAnimationLoop( animate );
@@ -103,6 +131,34 @@
 				console.error( e );
 
 			} );
+			
+			let dogstate = 1;
+			var xSpeed = 0.1;
+			var ySpeed = 0.1;
+			
+			document.addEventListener("keydown", onDocumentKeyDown, false);
+			function onDocumentKeyDown(event) {
+				var keyCode = event.which;
+				if (keyCode == 87) {
+					mixer.stopAllAction ();
+					mixer.clipAction( ggltf.animations[ 1 ] ).play();
+					dog.position.z += ySpeed;
+				} else if (keyCode == 83) {
+					mixer.stopAllAction ();
+					mixer.clipAction( ggltf.animations[ 2 ] ).play();
+					dog.position.z -= ySpeed;
+				} else if (keyCode == 65) {
+					mixer.stopAllAction ();
+					mixer.clipAction( ggltf.animations[ 0 ] ).play();
+					dog.position.x -= xSpeed;
+				} else if (keyCode == 68) {
+					mixer.stopAllAction ();
+					mixer.clipAction( ggltf.animations[ 3 ] ).play();
+					dog.position.x += xSpeed;
+				} else if (keyCode == 32) {
+					dog.position.set(0, 0, 0);
+				}
+			};
 
 
 			window.onresize = function () {
