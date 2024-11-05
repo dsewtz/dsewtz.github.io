@@ -49,8 +49,10 @@
 			
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
+			let environ, sphere, camera;
+			
 			let mixer;
-			let dog;
+			let dog;			
 			let act_sit; 
 			let act_walk; 
 			let act_lie; 
@@ -75,7 +77,7 @@
 			scene.background = new THREE.Color( 0xbfe3dd );
 			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set( 5, 2, 8 );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -83,6 +85,60 @@
 			controls.update();
 			controls.enablePan = false;
 			controls.enableDamping = true;
+			
+			//skysphere
+			{
+				// Create the panoramic sphere geometery
+				const panoSphereGeo = new THREE.SphereGeometry( 500, 25, 25 );
+
+				// Create the panoramic sphere material
+				const panoSphereMat = new THREE.MeshStandardMaterial( {
+					side: THREE.BackSide,
+					displacementScale: - 4.0
+				} );
+
+				// Create the panoramic sphere mesh
+				sphere = new THREE.Mesh( panoSphereGeo, panoSphereMat );
+
+				// Load and assign the texture and depth map
+				const manager = new THREE.LoadingManager();
+				const loader = new THREE.TextureLoader( manager );
+
+				loader.load( './img/kandao3.jpg', function ( texture ) {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
+					texture.minFilter = THREE.NearestFilter;
+					texture.generateMipmaps = false;
+					sphere.material.map = texture;
+
+				} );
+
+				loader.load( './img/kandao3_depthmap.jpg', function ( depth ) {
+
+					depth.minFilter = THREE.NearestFilter;
+					depth.generateMipmaps = false;
+					sphere.material.displacementMap = depth;
+
+				} );
+				
+				// On load complete add the panoramic sphere to the scene
+				manager.onLoad = function () {
+					scene.add( sphere );
+				};
+			}
+			//skybox
+			/*{
+			  const loader = new THREE.CubeTextureLoader();
+			  const texture = loader.load([
+				'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+				'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+				'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+				'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+				'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+				'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+			  ]);
+			  scene.background = texture;
+			}*/
 
 			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
@@ -92,8 +148,8 @@
 			loader.load( 'models/dog2.glb', function ( gltf ) {
 
 				const model = gltf.scene;
-				model.position.set( 0.0, 0.0, 0 );
-				model.scale.set( 1.0, 1.0, 1.0 );
+				model.position.set( 20.0, 1.0, 0.0 );
+				model.scale.set( 0.5, 0.5, 0.5 );
 				//scene.add( model );
 				
 				dog = model;
@@ -134,10 +190,25 @@
 				console.error( e );
 
 			} );
+			loader.load( 'models/scene2.glb', function ( gltf ) {
+
+				const environ = gltf.scene;
+				environ.position.set( 0.0, 0.0, 0 );
+				environ.scale.set( 1.0, 1.0, 1.0 );
+				scene.add( environ );
+			}, undefined, function ( e ) {
+				console.error( e );
+			} );
 			
 			let dogstate = 1;
 			var xSpeed = 0.1;
 			var ySpeed = 0.1;
+			
+			
+			const horse = new THREE.Object3D();
+			scene.add( horse );
+			horse.add( camera );
+			
 			
 			document.addEventListener("keydown", onDocumentKeyDown, false);
 			function onDocumentKeyDown(event) {
@@ -161,7 +232,8 @@
 				} else if (keyCode == 32) {
 					dog.position.set(0, 0, 0);
 				}
-			};
+			};		
+			
 			
 			document.body.appendChild( VRButton.createButton( renderer ) );
 
@@ -184,10 +256,32 @@
 
 				controls.update();
 
-				//stats.update();
+				//const time = performance.now();
+				//const delta = time - prevTime;
+				//for ( let i = 0; i < funfairs.length; i ++ ) {
+					//funfairs[ i ].rotation.y = time * 0.0004;
+				//}
+
+				/*progress += velocity;
+				progress = progress % 1;
+
+				position.copy( curve.getPointAt( progress ) );
+				position.y += 0.3;
+
+				horse.position.copy( position );
+
+				tangent.copy( curve.getTangentAt( progress ) );
+
+				velocity -= tangent.y * 0.0000001 * delta;
+				velocity = Math.max( 0.00004, Math.min( 0.0002, velocity ) );
+
+				horse.lookAt( lookAt.copy( position ).sub( tangent ) );*/
+
+				//
 
 				renderer.render( scene, camera );
 
+				//prevTime = time;
 			}
 
 

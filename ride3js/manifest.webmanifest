@@ -1,7 +1,7 @@
 {
   "name": "Ride3js",
   "short_name": "RIDE",
-  "description": "Improting a horse with ThreeJS",
+  "description": "Importing a horse with ThreeJS",
   "scope": "/ride3js/",
   "start_url": "/ride3js/",
   "background_color": "#ffffff",
