@@ -204,7 +204,6 @@
 	<script src="js/sammy.min.js" 		 type="text/javascript" 	charset="utf-8"></script>
 	<script src="js/knockout-3.4.2.js" 	 type="text/javascript" 	charset="utf-8"></script>
 	<script src="js/bootstrap.min.js" 	 type="text/javascript" 	charset="utf-8"></script>
-	<!--<script src="products.js" 	 type="text/javascript" 	charset="utf-8"></script>-->
     <script>  
 	
 		function find(myArray, key, value){
@@ -281,19 +280,6 @@
 				return trans;
 			}, this);
 			this.transText = ko.observable("NO!");
-			/*this.inputText = ko.pureComputed({
-				read: function () {
-					return this.transText();
-				},
-				write: function (value) {
-					this.transText(value);
-					this.outputText = "";
-					for (let i = 0; i < value.length; i++) {						
-						this.outputText[i] += value.charAt(i);
-					}					
-				},
-				owner: this
-			});*/
 			
 			encodeText = function() {
 				var previousCount = this.numberOfClicks();
@@ -311,19 +297,6 @@
 			self.goToTab = function(tab) { location.hash = tab.name };
 			self.goToFolder = function(folder) { location.hash = 'PC/'+folder };
 			self.goToMail = function(mail) { location.hash = 'PC/' + mail.folder + '/' + mail.id };
-			/*self.goToFolder = function(folder) {
-				self.chosenFolderId(folder);
-				self.chosenMailData(null);
-				$.get('/mail', {folder: folder }, self.chosenFolderData);
-			};
-			self.goToMail = function(mail){
-				self.chosenFolderId(mail.folder);
-				self.chosenFolderData(null);
-				$.get("/mail", {mailId: mail.id }, self.chosenMailData);
-			};*/
-			
-			// Show inbox by default
-			//self.goToFolder('Inbox');
 			
 			self.toggleActive = function (tab) {
 				self.selectedTab(tab);
@@ -339,7 +312,6 @@
 					self.chosenFolderId(this.params.folder);
 					self.chosenMailData(null);
 					self.chosenFolderData(productsDB);
-					//$.get("/mail", { folder: this.params.folder }, self.chosenFolderData);
 				});
 
 				this.get('#:tab/:folder/:mailId', function() {
@@ -347,10 +319,9 @@
 					self.chosenFolderId(this.params.folder);
 					self.chosenFolderData(null);					
 					self.chosenMailData(find(productsDB.mails,"id",this.params.mailId));
-					//$.get("/mail", { mailId: this.params.mailId }, self.chosenMailData);
 				});
 				
-				this.get('', function() { this.app.runRoute('get', '#File') });
+				this.get('', function() { this.app.runRoute('get', '#Encode') });
 			}).run();
 		};		
 		
@@ -360,5 +331,16 @@
 		}			
 		
     </script>
+	
+	<!--<script>
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.register (
+          '/caesar/sw.js',
+          {scope: '/caesar/'}
+        )
+      }
+  </script>
+  <script src="js/app.js"></script>-->
+	
 </body>
 </html>
