@@ -93,9 +93,10 @@
 					<div class="form-group">
 						<label for="inputArea">Some text:</label>
 						<textarea class="form-control" id="inputArea" rows="3" data-bind="textInput: inputText"></textarea>
-						<input type="submit" value="Submit" data-bind="click: encodeText">
+
+						<!--<input type="submit" value="Submit" data-bind="click: encodeText">
 						You've clicked <span data-bind="text: numberOfClicks"></span> times
-						<button data-bind="click: incrementClickCounter">Click me</button>
+						<button data-bind="click: incrementClickCounter">Click me</button>-->
 						<!--<label for="outputArea">Caesared Salated:</label>
 						<textarea class="form-control" id="outputArea" rows="3" data-bind="textInput: outputText"></textarea>-->			
 					</div>		
@@ -105,6 +106,20 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
+			<!--<div class="btn-group-toggle"> data-toggle="buttons">-->
+			<div class="group-toggle">
+				<td>
+					<label class="btn btn-primary" style="width:100px;"><input type="radio" value="1" data-bind="checked: radioSelectedOptionValue" />Greek</label>
+					<label class="btn btn-primary" style="width:100px;"><input type="radio" value="2" data-bind="checked: radioSelectedOptionValue" />Cyrillic</label>
+					<label class="btn btn-primary" style="width:100px;"><input type="radio" value="3" data-bind="checked: radioSelectedOptionValue" />Kanji</label>
+					<label class="btn btn-primary" style="width:100px;"><input type="radio" value="4" data-bind="checked: radioSelectedOptionValue" />Emoji</label>
+				</td>
+			</div>
+			<!--<span class="label">Radio button selection:</span><span data-bind="text: radioSelectedOptionValue"> !</span>-->
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8">
 				<!--Caesarsalated: <span data-bind="text: outputText"></span> times-->
 				<label for="outputArea">Caesarsalated:</label>
 				<textarea class="form-control" id="outputArea" rows="3" data-bind="textInput: outputText"></textarea>		
@@ -112,18 +127,6 @@
 		</div>
 	</div>
 			
-	<!--<div id="header_top" class="navbar navbar-static-top">
-		<div class="container">			
-			<ul class="nav navbar-nav" >
-			<li data-bind="click: $parent.toggleActive, css: $parent.selectedTab() == $data ? 'active': ''">
-				<a data-bind="attr: {href: '#' + name}, text: name"></a>
-			</li>
-			<li><a class="btn btn-lg" href="#load"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span></a></li>
-			<li><a class="btn btn-lg" href="#save"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></a></li>
-			<li><a href="">Drei</a></li>
-			</ul>
-		</div>
-	</div>-->
 
 	<div class="container" data-bind="visible: $root.selectedTab().name == 'Decode'">
 		<div class="row">
@@ -245,6 +248,7 @@
         }
         return code;
     };
+	
 		
 		function CaesarViewModel() {
 			// Data
@@ -256,13 +260,25 @@
 			self.chosenFolderData = ko.observable();			
 			self.chosenMailData = ko.observable();		
 			self.selectedTab = ko.observable(self.tabs[0]);
+			//self.radioSelectedOptionValue = ko.observable("4");
+			this.radioSelectedOptionValue = ko.observable("1");  
+			  /*this.radioSelectedOptionValue.subscribe( function(checkedVal) {
+				// here you can decide what to do depends on the new checkedVal
+				alert("Works! : "+ checkedVal);
+			  },this); */
 			
 			self.inputText = ko.observable("Warum rülpset und furzet ihr nicht? Hat es euch nicht geschmacket?");        // Initially blank
-			//self.outputText = ko.observable("abc");  // Prepopulate
+
 			this.outputText = ko.computed(function() {
-				//return this.inputText() + " " + this.inputText();
 				var value = this.inputText();
 				var trans = "";
+				var offs = 0x1F600;
+				//alert(this.radioSelectedOptionValue());
+				if(this.radioSelectedOptionValue()==="1") offs=0x0370;
+				else if(this.radioSelectedOptionValue()==="2") offs=0x0400;
+				else if(this.radioSelectedOptionValue()==="3") offs=0x4E00;
+				else if(this.radioSelectedOptionValue()==="4") offs=0x1F600;
+				
 				for (let i = 0; i < value.length; i++) {	
 					let c = value.codePointAt(i);
 					if(isWhitespace(value.charAt(i))){
@@ -271,11 +287,15 @@
 					}
 					else if(c<=32) trans += value.charAt(i);
 					else if(c>=33 && c<=0x00FF)
-						trans += String.fromCodePoint(c-33 + 0x1F600);					
-					else if(c>=(0x1F600-33)){
+						trans += String.fromCodePoint(c-33 + offs);					
+					else if(c>=(0x1F600-33))
 						trans += String.fromCodePoint(c+33 - 0x1F600);
-				    }
-					//trans += value.charAt(i);
+					else if(c>=(0x04E00-33) && c<=(0x04E00+128))
+						trans += String.fromCodePoint(c+33 - 0x4E00 );
+					else if(c>=(0x0400-33) && c<=(0x0400+128))
+						trans += String.fromCodePoint(c+33 - 0x0400 );
+					else if(c>=(0x0370-33) && c<=(0x0370+128))
+						trans += String.fromCodePoint(c+33 - 0x0370);
 				}
 				return trans;
 			}, this);
@@ -284,7 +304,6 @@
 			encodeText = function() {
 				var previousCount = this.numberOfClicks();
 				this.numberOfClicks(previousCount + 1);
-				//this.outputText(self.inputText());
 			}
 			
 			self.numberOfClicks = ko.observable(0),
