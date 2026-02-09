@@ -201,9 +201,8 @@
 			} );
 			
 			let dogstate = 1;
-			var xSpeed = 0.1;
-			var ySpeed = 0.1;
-			
+			let dogspeed = new THREE.Vector3( 0, 0, 0 );
+			var dogRot = new THREE.Vector3(0, 0, 0);
 			
 			const horse = new THREE.Object3D();
 			scene.add( horse );
@@ -215,23 +214,26 @@
 				var keyCode = event.which;
 				if (keyCode == 87) {
 					mixer.stopAllAction ();
-					mixer.clipAction( ggltf.animations[ 1 ] ).play();
-					dog.position.z += ySpeed;
+					//mixer.clipAction( ggltf.animations[ 1 ] ).play();
+					act_walk.play();
+					dogspeed.z += 0.5;
 				} else if (keyCode == 83) {
 					mixer.stopAllAction ();
-					mixer.clipAction( ggltf.animations[ 2 ] ).play();
-					dog.position.z -= ySpeed;
+					//mixer.clipAction( ggltf.animations[ 2 ] ).play();
+					act_lie.play();
+					dogspeed.z -= 0.5;
 				} else if (keyCode == 65) {
 					mixer.stopAllAction ();
-					mixer.clipAction( ggltf.animations[ 0 ] ).play();
-					dog.position.x -= xSpeed;
+					//mixer.clipAction( ggltf.animations[ 0 ] ).play();
+					dogRot.y += Math.PI / 4;					
 				} else if (keyCode == 68) {
 					mixer.stopAllAction ();
-					mixer.clipAction( ggltf.animations[ 3 ] ).play();
-					dog.position.x += xSpeed;
+					//mixer.clipAction( ggltf.animations[ 3 ] ).play();					
+					dogRot.y -= Math.PI / 4;
 				} else if (keyCode == 32) {
 					dog.position.set(0, 0, 0);
 				}
+				console.log('dog pos: '+JSON.stringify(dog.position)+' speed: '+JSON.stringify(dogspeed));
 			};		
 			
 			
@@ -278,6 +280,8 @@
 				horse.lookAt( lookAt.copy( position ).sub( tangent ) );*/
 
 				//
+				dog.rotateY(dogRot.y*delta);
+				dog.translateZ(delta*dogspeed.z);
 
 				renderer.render( scene, camera );
 

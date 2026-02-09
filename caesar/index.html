@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8">
+   <title>Caesar Chiffre</title>
+   
+	
+	<link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico"  />
+	<link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
+	<link rel="manifest" href="manifest.webmanifest" />	
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"  />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"  />
+    <style>
+       input, select {
+           width: 50%;
+           padding: 12px 20px;
+           margin: 8px 0;
+           display: inline-block;
+           border: 1px solid #ccc;
+           border-radius: 4px;
+           box-sizing: border-box;
+       }
+
+       input[type=submit] {
+           width: 50%;
+           background-color: #4CAF50;
+           color: white;
+           padding: 14px 20px;
+           margin: 8px 0;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+       }
+
+	   input[type=submit]:hover {
+		   background-color: #45a049;
+	   }
+
+       .form_container {
+           border-radius: 5px;
+           background-color: #f2f2f2;
+           padding: 20px;
+       }
+	   
+	   .logo {
+			padding-top: 10px;
+			padding-left: 10px;
+			padding-bottom: 10px;
+	   }
+	   .clr {
+			background-color: #4CAF50;			
+	   }
+	   .nav-tabs>li>a {
+			color: #555;
+	   }
+   </style>  
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-auto">
+				<span class="align-middle">
+				<a href="#">
+				<img class="logo" alt="Laurel Wreath Logo" src="images/favicon.png" height="100"/>				
+				</a>			
+				</span>
+				<h1 style="display:inline-block;">Gunnars wilde Zarenbuchstabensuppe</h1>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid clr">
+	<div class="container">
+	<ul class="nav nav-tabs" data-bind="foreach: tabs">
+		<li role="presentation" data-bind="click: $root.goToTab", css: $root.selectedTab() == $data ? 'active': ''">
+			<a data-bind="attr: {href: '#' + name}, text: name"></a>
+		</li>
+	</ul>
+	</div>
+	</div>
+	
+	<div class="container" data-bind="visible: $root.selectedTab().name == 'Encode'">
+		<div class="row">
+			<div class="col-md-6">
+			<h1>Input</h1>
+			</div>
+		</div>
+		<div class="row">  
+			<div class="col-md-8">
+				<div id="form_container">
+					<div class="form-group">
+						<label for="inputArea">Some text:</label>
+						<textarea class="form-control" id="inputArea" rows="3" data-bind="textInput: inputText"></textarea>
+						<input type="submit" value="Submit" data-bind="click: encodeText">
+						You've clicked <span data-bind="text: numberOfClicks"></span> times
+						<button data-bind="click: incrementClickCounter">Click me</button>
+						<!--<label for="outputArea">Caesared Salated:</label>
+						<textarea class="form-control" id="outputArea" rows="3" data-bind="textInput: outputText"></textarea>-->			
+					</div>		
+				</div>
+			
+		</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<!--Caesarsalated: <span data-bind="text: outputText"></span> times-->
+				<label for="outputArea">Caesarsalated:</label>
+				<textarea class="form-control" id="outputArea" rows="3" data-bind="textInput: outputText"></textarea>		
+			</div>
+		</div>
+	</div>
+			
+	<!--<div id="header_top" class="navbar navbar-static-top">
+		<div class="container">			
+			<ul class="nav navbar-nav" >
+			<li data-bind="click: $parent.toggleActive, css: $parent.selectedTab() == $data ? 'active': ''">
+				<a data-bind="attr: {href: '#' + name}, text: name"></a>
+			</li>
+			<li><a class="btn btn-lg" href="#load"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span></a></li>
+			<li><a class="btn btn-lg" href="#save"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></a></li>
+			<li><a href="">Drei</a></li>
+			</ul>
+		</div>
+	</div>-->
+
+	<div class="container" data-bind="visible: $root.selectedTab().name == 'Decode'">
+		<div class="row">
+		  <div class="col-md-6">
+		  <input type="file" id="files" name="files[]">Load</input>
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-md-6">
+		  <div id="form_container">
+			   <form action="">
+				   <label for="duration">Duration</label>
+				   <input type="number" name="duration" id="duration" value="100">seconds<br>
+				   <label for="female">Female</label>
+				   <input type="radio" name="gender" id="female" value="female"><br>
+				   <label for="other">Other</label>
+				   <input type="radio" name="gender" id="other" value="other"><br><br>
+				   <input type="submit" value="Submit">
+			   </form> 
+		   </div>
+		  </div>
+		  <div class="col-md-6">.col</div>
+		</div>
+		<div class="row">
+		  <div class="col-md-4">.col-md-4</div>
+		  <div class="col-md-4">.col-md-4</div>
+		</div>
+	</div>
+	
+   <div class="container form_container" data-bind="visible: $root.selectedTab().name == 'Readme'">
+       <form action="">
+           <label for="duration">Duration</label>
+           <input type="number" name="duration" id="duration" value="100">seconds<br>
+           <label for="female">Female</label>
+           <input type="radio" name="gender" id="female" value="female"><br>
+           <label for="other">Other</label>
+           <input type="radio" name="gender" id="other" value="other"><br><br>
+           <input type="submit" value="Submit">
+       </form> 
+   </div>
+   
+   <!-- Folders -->
+   <div class="container" data-bind="visible: $root.selectedTab().name == 'About'">
+   <div class="row">
+	<ul class="nav navbar-nav folders" data-bind="foreach: folders">
+		<li><a data-bind="text: $data,
+						css: { selected: $data == $root.chosenFolderId() },
+						click: $root.goToFolder"></a></li>
+	</ul>
+	</div>
+	
+	<!-- Mails grid -->
+	<table class="table-striped mails" data-bind="with: chosenFolderData">
+		<thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
+		<tbody data-bind="foreach: mails">
+			<tr data-bind="click: $root.goToMail">
+				<td data-bind="text: from"></td>
+				<td data-bind="text: to"></td>
+				<td data-bind="text: subject"></td>
+				<td data-bind="text: date"></td>
+			</tr>     
+		</tbody>
+	</table>
+	<!-- Chosen mail -->
+	<div class=" row viewMail" data-bind="with: chosenMailData">
+		<div class="mailInfo">
+			<h1 data-bind="text: subject"></h1>
+			<p><label>From</label>: <span data-bind="text: from"></span></p>
+			<p><label>To</label>: <span data-bind="text: to"></span></p>
+			<p><label>Date</label>: <span data-bind="text: date"></span></p>
+		</div>
+		<p class="message" data-bind="html: messageContent" />
+	</div>
+
+	</div>
+
+	<script src="js/jquery-1.12.4.min.js" type="text/javascript" 	charset="utf-8"></script>
+	<script src="js/sammy.min.js" 		 type="text/javascript" 	charset="utf-8"></script>
+	<script src="js/knockout-3.4.2.js" 	 type="text/javascript" 	charset="utf-8"></script>
+	<script src="js/bootstrap.min.js" 	 type="text/javascript" 	charset="utf-8"></script>
+	<!--<script src="products.js" 	 type="text/javascript" 	charset="utf-8"></script>-->
+    <script>  
+	
+		function find(myArray, key, value){
+			for (var i=0; i < myArray.length; i++) {
+				if (myArray[i][key] == value) {
+					return myArray[i];
+				}
+			}
+			return null;
+		}
+		
+		function isWhitespace(c) {
+			return c === ' '
+				|| c === '\n'
+				|| c === '\t'
+				|| c === '\r'
+				|| c === '\f'
+				|| c === '\v'
+				|| c === '\u00a0'
+				|| c === '\u1680'
+				|| c === '\u2000'
+				|| c === '\u200a'
+				|| c === '\u2028'
+				|| c === '\u2029'
+				|| c === '\u202f'
+				|| c === '\u205f'
+				|| c === '\u3000'
+				|| c === '\ufeff'
+		}
+		
+		String.prototype.codePointAt = function (pos) {
+        pos = isNaN(pos) ? 0 : pos;
+        var str = String(this),
+            code = str.charCodeAt(pos),
+            next = str.charCodeAt(pos + 1);
+        // If a surrogate pair
+        if (0xD800 <= code && code <= 0xDBFF && 0xDC00 <= next && next <= 0xDFFF) {
+            return ((code - 0xD800) * 0x400) + (next - 0xDC00) + 0x10000;
+        }
+        return code;
+    };
+		
+		function CaesarViewModel() {
+			// Data
+			var self = this;
+			self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
+			self.tabs = [{ name: 'Encode'},{ name: 'Decode'},{ name: 'Readme'},{ name: 'About'},];
+
+			self.chosenFolderId = ko.observable();
+			self.chosenFolderData = ko.observable();			
+			self.chosenMailData = ko.observable();		
+			self.selectedTab = ko.observable(self.tabs[0]);
+			
+			self.inputText = ko.observable("Warum rülpset und furzet ihr nicht? Hat es euch nicht geschmacket?");        // Initially blank
+			//self.outputText = ko.observable("abc");  // Prepopulate
+			this.outputText = ko.computed(function() {
+				//return this.inputText() + " " + this.inputText();
+				var value = this.inputText();
+				var trans = "";
+				for (let i = 0; i < value.length; i++) {	
+					let c = value.codePointAt(i);
+					if(isWhitespace(value.charAt(i))){
+						trans += value.charAt(i);
+						continue;
+					}
+					else if(c<=32) trans += value.charAt(i);
+					else if(c>=33 && c<=0x00FF)
+						trans += String.fromCodePoint(c-33 + 0x1F600);					
+					else if(c>=(0x1F600-33)){
+						trans += String.fromCodePoint(c+33 - 0x1F600);
+				    }
+					//trans += value.charAt(i);
+				}
+				return trans;
+			}, this);
+			this.transText = ko.observable("NO!");
+			/*this.inputText = ko.pureComputed({
+				read: function () {
+					return this.transText();
+				},
+				write: function (value) {
+					this.transText(value);
+					this.outputText = "";
+					for (let i = 0; i < value.length; i++) {						
+						this.outputText[i] += value.charAt(i);
+					}					
+				},
+				owner: this
+			});*/
+			
+			encodeText = function() {
+				var previousCount = this.numberOfClicks();
+				this.numberOfClicks(previousCount + 1);
+				//this.outputText(self.inputText());
+			}
+			
+			self.numberOfClicks = ko.observable(0),
+			incrementClickCounter = function() {
+				var previousCount = this.numberOfClicks();
+				this.numberOfClicks(previousCount + 1);
+			}	
+						
+			// Behaviours
+			self.goToTab = function(tab) { location.hash = tab.name };
+			self.goToFolder = function(folder) { location.hash = 'PC/'+folder };
+			self.goToMail = function(mail) { location.hash = 'PC/' + mail.folder + '/' + mail.id };
+			/*self.goToFolder = function(folder) {
+				self.chosenFolderId(folder);
+				self.chosenMailData(null);
+				$.get('/mail', {folder: folder }, self.chosenFolderData);
+			};
+			self.goToMail = function(mail){
+				self.chosenFolderId(mail.folder);
+				self.chosenFolderData(null);
+				$.get("/mail", {mailId: mail.id }, self.chosenMailData);
+			};*/
+			
+			// Show inbox by default
+			//self.goToFolder('Inbox');
+			
+			self.toggleActive = function (tab) {
+				self.selectedTab(tab);
+			};
+			
+			 // Client-side routes    
+			Sammy(function() {
+				this.get('#:tab', function() {
+					self.selectedTab(find(self.tabs, "name", this.params.tab));
+				});
+				this.get('#:tab/:folder', function() {
+					self.selectedTab(find(self.tabs, "name", this.params.tab));
+					self.chosenFolderId(this.params.folder);
+					self.chosenMailData(null);
+					self.chosenFolderData(productsDB);
+					//$.get("/mail", { folder: this.params.folder }, self.chosenFolderData);
+				});
+
+				this.get('#:tab/:folder/:mailId', function() {
+					self.selectedTab(find(self.tabs, "name", this.params.tab));
+					self.chosenFolderId(this.params.folder);
+					self.chosenFolderData(null);					
+					self.chosenMailData(find(productsDB.mails,"id",this.params.mailId));
+					//$.get("/mail", { mailId: this.params.mailId }, self.chosenMailData);
+				});
+				
+				this.get('', function() { this.app.runRoute('get', '#File') });
+			}).run();
+		};		
+		
+		
+        window.onload = function(){
+			ko.applyBindings(new CaesarViewModel());
+		}			
+		
+    </script>
+</body>
+</html>

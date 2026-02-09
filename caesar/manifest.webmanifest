@@ -1,0 +1,27 @@
+{
+  "name": "Gunnars wildes Zarensuppen-Chiffre",
+  "short_name": "Caesar",
+  "description": "Unicode-based caesar chiffres just4fun",
+  "scope": "/caesar/",
+  "start_url": "/caesar/",
+  "background_color": "#adf3f8",
+  "theme_color": "#adf3f8",
+  "display": "standalone", 
+  "icons": [
+      {
+        "src": "/caesar/images/favicon.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      },
+	  {
+        "src": "/caesar/images/favicon.ico",
+        "type": "image/x-icon",
+        "sizes": "256x256"
+      }
+	  {
+        "src": "/caesar/images/favicon.svg",
+        "type": "image/svg+xml",
+        "sizes": "256x256"
+      }
+  ]
+}
